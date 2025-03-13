@@ -1,0 +1,24 @@
+﻿@model AAPlayground.Models.CampFeesModel
+
+@{
+    ViewBag.Title = "Display Camp Fees";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form asp-action="DisplayCampFees">
+    <div>
+        <label>Parent Name:</label>
+        <input asp-for="ParentName" />
+    </div>
+    <div>
+        <label>Child Name:</label>
+        <input asp-for="ChildName" />
+    </div>
+    
+    <div>
+        <label>Total Due:</label>
+        <input asp-for="TotalDue" readonly />
+    </div>
+    <button type="submit">Calculate</button>
+</form>

@@ -9,16 +9,21 @@ namespace AAPlayground.Controllers
 {
     public class CampController : Controller
     {
-        public ActionResult DisplayCampFees()
+        // GET: CampFees
+        public ActionResult Index()
         {
             return View(new CampFeesModel());
         }
 
         [HttpPost]
-        public ActionResult DisplayCampFees(CampFeesModel model)
+        public ActionResult Result(CampFeesModel model)
         {
-            model.TotalDue = model.calcTotalDue();
-            return View(model);
+            if (ModelState.IsValid)
+            {
+                model.TotalDue = model.calcTotalDue();
+                return View("Result", model);
+            }
+            return View("Index", model);
         }
     }
 }

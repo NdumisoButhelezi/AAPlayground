@@ -1,0 +1,32 @@
+﻿@model AAPlayground.Models.CampFeesModel
+
+@{
+    ViewBag.Title = "Camp Fees Calculator";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@using (Html.BeginForm("Result", "Camp", FormMethod.Post))
+{
+    <div>
+        <label>Parent Name:</label>
+        @Html.TextBoxFor(m => m.ParentName)
+    </div>
+    <div>
+        <label>Child Name:</label>
+        @Html.TextBoxFor(m => m.ChildName)
+    </div>
+    <div>
+        <label>Child Age:</label>
+        @Html.TextBoxFor(m => m.ChildAge)
+    </div>
+    <div>
+        <label>Start Time:</label>
+        @Html.TextBoxFor(m => m.StartTime, "{0:yyyy-MM-ddTHH:mm}", new { type = "datetime-local" })
+    </div>
+    <div>
+        <label>End Time:</label>
+        @Html.TextBoxFor(m => m.EndTime, "{0:yyyy-MM-ddTHH:mm}", new { type = "datetime-local" })
+    </div>
+    <button type="submit">Calculate Fees</button>
+}

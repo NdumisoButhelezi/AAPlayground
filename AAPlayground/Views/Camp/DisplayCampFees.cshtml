@@ -6,19 +6,30 @@
 
 <h2>@ViewBag.Title</h2>
 
-<form asp-action="DisplayCampFees">
-    <div>
+<form method="post">
+    <div class="form-group">
         <label>Parent Name:</label>
-        <input asp-for="ParentName" />
+        <input asp-for="ParentName" class="form-control" />
     </div>
-    <div>
+    <div class="form-group">
         <label>Child Name:</label>
-        <input asp-for="ChildName" />
+        <input asp-for="ChildName" class="form-control" />
     </div>
-    
-    <div>
+    <div class="form-group">
+        <label>Child Age:</label>
+        <input type="number" asp-for="ChildAge" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Start Time:</label>
+        <input type="time" asp-for="StartTime" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>End Time:</label>
+        <input type="time" asp-for="EndTime" class="form-control" />
+    </div>
+    <div class="form-group">
         <label>Total Due:</label>
-        <input asp-for="TotalDue" readonly />
+        <p class="form-control-static">@Model.TotalDue.ToString("C2")</p> <!-- Display as static text -->
     </div>
-    <button type="submit">Calculate</button>
+    <button type="submit" class="btn btn-primary">Calculate</button>
 </form>

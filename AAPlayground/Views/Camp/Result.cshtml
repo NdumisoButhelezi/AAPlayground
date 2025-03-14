@@ -1,0 +1,19 @@
+﻿@model AAPlayground.Models.CampFeesModel
+
+@{
+    ViewBag.Title = "Fee Calculation Result";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div>
+    <h3>Parent Name: @Model.ParentName</h3>
+    <h3>Child Name: @Model.ChildName</h3>
+    <h3>Child Age: @Model.ChildAge</h3>
+    <h3>Total Hours: @((Model.EndTime - Model.StartTime).TotalHours.ToString("F2"))</h3>
+    <h3>Total Fee Before VAT: @Model.calcCampFee()</h3>
+    <h3>VAT: @Model.calcVat()</h3>
+    <h3>Total Due: @Model.TotalDue</h3>
+</div>
+
+<a href="@Url.Action("Index", "CampFees")">Calculate New Fee</a>

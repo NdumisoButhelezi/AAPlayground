@@ -180,6 +180,8 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Camp\DisplayCampFees.cshtml" />
+    <Content Include="Views\Camp\Index.cshtml" />
+    <Content Include="Views\Camp\Result.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

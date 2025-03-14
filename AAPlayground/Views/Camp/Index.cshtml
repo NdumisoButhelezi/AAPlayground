@@ -1,32 +1,76 @@
 ﻿@model AAPlayground.Models.CampFeesModel
-
 @{
     ViewBag.Title = "Camp Fees Calculator";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="card-title mb-0 text-center">@ViewBag.Title</h2>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Result", "Camp", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                    {
+                        <div class="mb-3">
+                            <label for="ParentName" class="form-label">Parent Name</label>
+                            @Html.TextBoxFor(m => m.ParentName, new { @class = "form-control", placeholder = "Enter parent's full name", required = "required" })
+                            <div class="invalid-feedback">Please provide a valid name.</div>
+                        </div>
 
-@using (Html.BeginForm("Result", "Camp", FormMethod.Post))
-{
-    <div>
-        <label>Parent Name:</label>
-        @Html.TextBoxFor(m => m.ParentName)
+                        <div class="mb-3">
+                            <label for="ChildName" class="form-label">Child Name</label>
+                            @Html.TextBoxFor(m => m.ChildName, new { @class = "form-control", placeholder = "Enter child's full name", required = "required" })
+                            <div class="invalid-feedback">Please provide a valid name.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ChildAge" class="form-label">Child Age</label>
+                            @Html.TextBoxFor(m => m.ChildAge, new { @class = "form-control", type = "number", min = "3", max = "17", placeholder = "Enter child's age", required = "required" })
+                            <div class="invalid-feedback">Please provide a valid age between 3 and 17.</div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="StartTime" class="form-label">Start Time</label>
+                                @Html.TextBoxFor(m => m.StartTime, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local", required = "required" })
+                                <div class="invalid-feedback">Please select a valid start time.</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="EndTime" class="form-label">End Time</label>
+                                @Html.TextBoxFor(m => m.EndTime, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local", required = "required" })
+                                <div class="invalid-feedback">Please select a valid end time.</div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Calculate Fees</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-        <label>Child Name:</label>
-        @Html.TextBoxFor(m => m.ChildName)
-    </div>
-    <div>
-        <label>Child Age:</label>
-        @Html.TextBoxFor(m => m.ChildAge)
-    </div>
-    <div>
-        <label>Start Time:</label>
-        @Html.TextBoxFor(m => m.StartTime, "{0:yyyy-MM-ddTHH:mm}", new { type = "datetime-local" })
-    </div>
-    <div>
-        <label>End Time:</label>
-        @Html.TextBoxFor(m => m.EndTime, "{0:yyyy-MM-ddTHH:mm}", new { type = "datetime-local" })
-    </div>
-    <button type="submit">Calculate Fees</button>
+</div>
+
+@section Scripts {
+    <script>
+        // Enable Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
 }

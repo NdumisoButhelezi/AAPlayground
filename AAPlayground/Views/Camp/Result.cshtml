@@ -1,19 +1,324 @@
 ﻿@model AAPlayground.Models.CampFeesModel
-
 @{
     ViewBag.Title = "Fee Calculation Result";
+    // Define our color scheme variables for consistency
+    var primaryColor = "#0d6efd"; // Blue
+    var secondaryColor = "#212529"; // Black
+    var accentColor = "#dc3545"; // Red
 }
 
-<h2>@ViewBag.Title</h2>
+@section Styles {
+    <!-- Animate.css for animations -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
-<div>
-    <h3>Parent Name: @Model.ParentName</h3>
-    <h3>Child Name: @Model.ChildName</h3>
-    <h3>Child Age: @Model.ChildAge</h3>
-    <h3>Total Hours: @((Model.EndTime - Model.StartTime).TotalHours.ToString("F2"))</h3>
-    <h3>Total Fee Before VAT: @Model.calcCampFee()</h3>
-    <h3>VAT: @Model.calcVat()</h3>
-    <h3>Total Due: @Model.TotalDue</h3>
+    <style>
+        /* Custom styles for our color scheme */
+        .bg-primary-custom {
+            background-color: @primaryColor;
+        }
+
+        .bg-secondary-custom {
+            background-color: @secondaryColor;
+        }
+
+        .text-accent {
+            color: @accentColor;
+        }
+
+        /* Ensuring black text for better readability */
+        .text-section,
+        .card-title,
+        .card-header h4,
+        .table th,
+        .table td,
+        h2, h3, h4, h5, p {
+            color: #000000;
+        }
+
+        /* Override for specific headers that need white text on dark backgrounds */
+        .bg-primary-custom h3,
+        .bg-secondary-custom h4,
+        .card-header.bg-secondary-custom h4,
+        .text-white {
+            color: #ffffff !important;
+        }
+
+        /* Card header with black text */
+        .card-header-black {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            color: #000000;
+        }
+
+        .card-header-black h4 {
+            color: #000000;
+            font-weight: 600;
+        }
+
+        /* Custom animation for the card entrance */
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Pulse animation for the total amount */
+        .pulse-once {
+            animation: pulse 1.5s ease-in-out 1s;
+        }
+
+        /* Custom hover effect for buttons */
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Loading spinner styles */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .spinner-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Receipt paper effect */
+        .receipt-container {
+            background-color: white;
+            position: relative;
+        }
+
+        .receipt-container:before, .receipt-container:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 20px;
+        }
+
+        .receipt-container:before {
+            top: -10px;
+            background: linear-gradient(135deg, white 33%, transparent 33%) 0 0,
+                        linear-gradient(225deg, white 33%, transparent 33%) 0 0;
+            background-size: 20px 20px;
+        }
+
+        .receipt-container:after {
+            bottom: -10px;
+            background: linear-gradient(45deg, transparent 33%, white 33%) 0 0,
+                        linear-gradient(315deg, transparent 33%, white 33%) 0 0;
+            background-size: 20px 20px;
+        }
+
+        /* Ensure buttons have good contrast */
+        .btn-primary-custom {
+            background-color: @primaryColor;
+            color: #ffffff;
+            border-color: darken(@primaryColor, 10%);
+        }
+
+        .btn-primary-custom:hover {
+            background-color: darken(@primaryColor, 10%);
+        }
+
+        /* Section titles with black text */
+        .section-title {
+            color: #000000;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+    </style>
+}
+
+<!-- Loading indicator that appears during page transitions -->
+<div id="loadingSpinner" class="spinner-overlay">
+    <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
 </div>
 
-<a href="@Url.Action("Index", "Camp")">Calculate New Fee</a>
+<!-- Main content container with animation -->
+<div class="animate__animated animate__fadeIn">
+    <!-- Page title with animation -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-section animate__animated animate__fadeInDown">@ViewBag.Title</h2>
+        </div>
+    </div>
+
+    @* Use a card with custom animation *@
+    <div class="card shadow fade-in-up receipt-container">
+        @* Card header with our primary blue color *@
+        <div class="card-header bg-primary-custom text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 animate__animated animate__fadeInLeft">
+                    <i class="bi bi-receipt me-2"></i>Camp Fee Details
+                </h3>
+                <div class="animate__animated animate__fadeInRight">
+                    <span class="badge bg-secondary-custom">
+                        <i class="bi bi-calendar-check me-1"></i>@DateTime.Now.ToString("MMM dd, yyyy")
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            @* Main content section with animate on scroll effects *@
+            <div class="row mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="col-lg-6">
+                    @* Family information section with BLACK TEXT header *@
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header card-header-black">
+                            <h4 class="mb-0"><i class="bi bi-people me-2"></i>Family Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <th class="text-section"><i class="bi bi-person me-2"></i>Parent Name:</th>
+                                        <td class="fw-bold text-section">@Model.ParentName</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-section"><i class="bi bi-person-heart me-2"></i>Child Name:</th>
+                                        <td class="fw-bold text-section">@Model.ChildName</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-section"><i class="bi bi-123 me-2"></i>Child Age:</th>
+                                        <td class="fw-bold text-section">@Model.ChildAge</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    @* Camp details section with BLACK TEXT header *@
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header card-header-black">
+                            <h4 class="mb-0"><i class="bi bi-clock-history me-2"></i>Camp Schedule</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <th class="text-section"><i class="bi bi-calendar-plus me-2"></i>Start Time:</th>
+                                        <td class="text-section">@Model.StartTime.ToString("MMM dd, yyyy - h:mm tt")</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-section"><i class="bi bi-calendar-minus me-2"></i>End Time:</th>
+                                        <td class="text-section">@Model.EndTime.ToString("MMM dd, yyyy - h:mm tt")</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-section"><i class="bi bi-hourglass-split me-2"></i>Total Hours:</th>
+                                        <td class="fw-bold text-section">@((Model.EndTime - Model.StartTime).TotalHours.ToString("F2"))</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="animate__animated animate__fadeIn" style="animation-delay: 0.4s;">
+
+            @* Fee summary section with special animation for the total *@
+            <div class="row animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card border-accent shadow">
+                        <div class="card-header card-header-black">
+                            <h4 class="mb-0 text-center"><i class="bi bi-currency-dollar me-2"></i>Fee Summary</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <tr class="animate__animated animate__fadeInRight" style="animation-delay: 0.7s;">
+                                        <th class="text-section"><i class="bi bi-cash me-2"></i>Base Fee:</th>
+                                        <td class="text-end fw-bold text-section">@Model.calcCampFee().ToString("C")</td>
+                                    </tr>
+                                    <tr class="animate__animated animate__fadeInRight" style="animation-delay: 0.8s;">
+                                        <th class="text-section"><i class="bi bi-receipt-cutoff me-2"></i>VAT:</th>
+                                        <td class="text-end fw-bold text-section">@Model.calcVat().ToString("C")</td>
+                                    </tr>
+                                    <tr class="bg-light animate__animated animate__fadeInRight pulse-once" style="animation-delay: 0.9s;">
+                                        <th class="h4 text-accent"><i class="bi bi-receipt-cutoff me-2"></i>Total Due:</th>
+                                        <td class="text-end h4 text-accent">@Model.TotalDue.ToString("C")</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Footer with action buttons *@
+        <div class="card-footer text-center py-4 animate__animated animate__fadeInUp" style="animation-delay: 1s;">
+            <a href="@Url.Action("Index", "Camp")" class="btn btn-lg btn-primary-custom me-3 btn-custom"
+               onclick="showLoading()">
+                <i class="bi bi-calculator me-2"></i> Calculate New Fee
+            </a>
+            <button class="btn btn-lg btn-outline-secondary btn-custom" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i> Print Receipt
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Function to show loading indicator
+        function showLoading() {
+            document.getElementById('loadingSpinner').classList.add('show');
+        }
+
+        // Display loading indicator when navigating away from the page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Configure loading indicator
+            const links = document.querySelectorAll('a:not([target="_blank"])');
+            links.forEach(link => {
+                link.addEventListener('click', function () {
+                    showLoading();
+                });
+            });
+
+            // Hide loading spinner when page is fully loaded
+            window.addEventListener('load', function () {
+                document.getElementById('loadingSpinner').classList.remove('show');
+            });
+
+            // Add subtle animations when scrolling
+            window.addEventListener('scroll', function () {
+                const elements = document.querySelectorAll('.card');
+
+                elements.forEach(element => {
+                    const position = element.getBoundingClientRect();
+
+                    // If element is in viewport
+                    if (position.top < window.innerHeight && position.bottom >= 0) {
+                        element.style.transform = 'translateY(-5px)';
+                        element.style.transition = 'transform 0.3s ease';
+                    } else {
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -20,6 +20,7 @@ namespace AAPlayground.Controllers
         {
             if (ModelState.IsValid)
             {
+                model.EndTime = DateTime.Now; // Ensure EndTime is always set to current time
                 model.TotalDue = model.calcTotalDue();
                 return View("Result", model);
             }

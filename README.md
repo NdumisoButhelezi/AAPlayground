@@ -23,3 +23,6 @@ To get started, clone the repository to your local machine:
 ```bash
 git clone https://github.com/yourusername/camp-fees-calculator.git
 cd camp-fees-calculator
+
+
+![image](https://github.com/user-attachments/assets/3ecb353f-c7c8-4623-b284-079b62e483ff)

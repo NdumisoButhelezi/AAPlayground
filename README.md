@@ -17,6 +17,9 @@ This ASP.NET MVC application calculates the daily fees for a children's camp bas
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
+
+![image](https://github.com/user-attachments/assets/3ecb353f-c7c8-4623-b284-079b62e483ff)
+
 ### Cloning the Repository
 To get started, clone the repository to your local machine:
 
@@ -25,4 +28,3 @@ git clone https://github.com/yourusername/camp-fees-calculator.git
 cd camp-fees-calculator
 
 
-![image](https://github.com/user-attachments/assets/3ecb353f-c7c8-4623-b284-079b62e483ff)
